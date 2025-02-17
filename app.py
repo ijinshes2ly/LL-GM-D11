@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, render_template, jsonify
 import mysql.connector
 
 app = Flask(__name__)
@@ -20,31 +20,16 @@ def get_db_connection():
 def get_growth_marketing_data():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
     cursor.execute("SELECT * FROM growth_marketing")
     data = cursor.fetchall()
-
     cursor.close()
     conn.close()
-
     return jsonify(data)
 
-# API: 특정 마케팅 채널 데이터 조회
-@app.route('/growth-marketing/<channel>', methods=['GET'])
-def get_marketing_by_channel(channel):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+# 웹 페이지 렌더링
+@app.route('/')  # /로 연결될 시에 
+def index():
+    return render_template('index.html') #index.html 주소를 반환
 
-    cursor.execute("SELECT * FROM growth_marketing WHERE channel = %s", (channel,))
-    data = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    if not data:
-        return jsonify({"error": "해당 마케팅 채널의 데이터가 없습니다."}), 404
-
-    return jsonify(data)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5004, debug=True)
+if __name__ == '__main__':  # 만약 이름이 __main__이라면
+    app.run(host='0.0.0.0', port=5003, debug=True)  # 실행
